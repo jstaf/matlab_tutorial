@@ -104,7 +104,7 @@ thresholded = medfilt2(thresholded);
 labeled = bwlabel(thresholded);
 showRegions(labeled); % much better!
 
-%% Object analysis
+%% Getting our objects
 
 % So we have a set of objects that we've detected, but there are still some
 % random smaller regions in there. How do we filter those out?
@@ -113,6 +113,74 @@ showRegions(labeled); % much better!
 regions = regionprops(labeled);
 % returns a structure that we can examine
 regions
-% we want to look at the areas of the regions and filter out small ones
+% we want to look at the areas of the regions and filter out small ones. We
+% will do this using the 'Area' attribute.
 regions.Area
 
+% Let's delete the smaller regions completely... to do this, we need to
+% recalculate the regionprops with lists of the pixels in each region.
+
+% Fortunately, regionprops has options for that!
+regions = regionprops(labeled, 'Area', 'Centroid', 'PixelList', 'PixelIdxList', 'BoundingBox');
+
+% small regions are filtered out of our data
+regionNum = 1;
+sizeThresh = 500;
+while (regionNum <= length([regions.Area]))
+    % look for regions that are smaller than our sizeThresh
+    if (regions(regionNum).Area < sizeThresh)
+        % unlabel pixels in small regions
+        for pixRow = 1:size(regions(regionNum).PixelList,1);
+            labeled( ...
+                regions(regionNum).PixelList(pixRow,2), ...
+                regions(regionNum).PixelList(pixRow,1)) ...
+                = 0;
+        end
+        % now delete the entry
+        regions(regionNum) = [];
+    else
+        regionNum = regionNum + 1;
+    end
+end
+
+% check to see that we filtered out the small regions
+labeled = bwlabel(logical(labeled));
+showRegions(labeled);
+% so now we only have the birds...
+
+%% Analyzing objects
+
+% We already have the positions available through the regionprops function
+% that we executed earlier.
+positions = reshape([regions.Centroid], 2, length([regions.Centroid])/2)';
+
+% Let's check our work:
+figure('Name', 'Bird positions');
+imshow(birds);
+hold on;
+scatter(positions(:, 1), positions(:, 2), [], 'yellow');
+hold off;
+% Yep there are the positions!
+
+% What if we wanted the average pixel values from the red channel for each bird?
+intensity = zeros(length(regions), 1);
+for i = 1:length(regions)
+    intensity(i) = mean(mean(birds( ...
+        regions(i).PixelList(:, 2), ...
+        regions(i).PixelList(:, 1), 1)));
+end
+intensity
+
+% What if we wanted to seperate all the birds into separate images?
+separated = struct();
+figure;
+hold on;
+for i = 1:length(regions)
+    separated(i).Image = imcrop(birds, regions(i).BoundingBox);
+    subplot(2,4,i), subimage(separated(i).Image);
+end
+hold off;
+
+% Honestly you can pretty much do anything you want in relation to image
+% processing in MATLAB and it will work. Analyzing videos is just image
+% analysis looped over the length of the video.
