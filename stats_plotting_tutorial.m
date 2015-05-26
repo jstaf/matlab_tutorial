@@ -74,6 +74,20 @@ xlabel('x values');
 ylabel('y values');
 title('random title');
 
+%% ######################################################
+% Make a scatterplot of the following values... with red markers and a size
+% of 20
+
+XVals = 1:20;
+YVals = rand(1, length(XVals));
+
+% Make a line plot of the same data, but with a line width of 3. Make the
+% line purple just for kicks.
+
+
+% plot the two on the same plot and change the axis to have x limits of 0
+% and 12, and y limits of 0.5 and 1
+
 %% ttests and 1-way ANOVA
 
 % we are going to load a built-in dataset...
@@ -124,3 +138,8 @@ xlabel('Species');
 % confidence intervals of the true difference of means. The sixth column
 % shows the p-value for a hypothesis that the true difference of means for
 % the corresponding groups is equal to zero.
+
+%% ###################################################3
+% Do a ttest on the the following data. What's the p-value?
+data1 = 1:20;
+data2 = 15:0.5:40;

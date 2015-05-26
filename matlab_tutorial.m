@@ -95,6 +95,11 @@ dimensional(:, :, 2) = [4, 5, 6; 9, 7, 5];
 % this array is 3x2x2
 dimensional
 
+% You can "flip" a matrix with the apostrophe (this is called
+% "transposing")
+a
+a'
+
 %% indexing
 
 % what if we wanted to get a certain value from a matrix or vector?
@@ -141,6 +146,18 @@ a(:, 4)
 % grab elements 1:3 of the second row
 a(2, 1:3)
 
+%% ##############################################################
+% Here is a 3D matrix. Get the first dimension of the matrix.
+
+test(:, :, 1) = [1, 4, 5; 5, NaN, 97; NaN, NaN, NaN];
+test(:, :, 2) = [4, 5, 23; NaN, 7, 5; 12, 4, NaN];
+test(:, :, 3) = [2, 3, 3; 2, NaN, 5; 12, NaN, NaN];
+
+% How about all of the values that are not NaNs? (Doesn't matter if you lose
+% the formatting...)
+
+% ##############################################################
+
 %% functions (how to actually start doing things)
 
 % functions are special operations that DO things (vague, I know, but they
@@ -180,6 +197,33 @@ isempty(a)
 doc isempty
 % you can also hit f1 when your mouse is on a function
 
+%% creating your own functions
+
+% Unfortunately in MATLAB all functions need to have their own file. So
+% lets create one with the following code, save it, and come back here:
+
+% function [ answer ] = adder(number1, number2 )
+% %ADDER Adds two numbers together
+% %   Pretty self explanatory
+% 
+% answer = number1 + number2;
+% 
+% end
+
+%% ##############################################################
+% can we make a function that performs an average? (Hint: use the sum() and
+% length() functions)
+
+
+% What is the average of this vector?
+testVector = [1, 4, 7, 23, 4, 2];
+
+
+% What about this one?
+testVector2 = [1, 4, 7, NaN, 4, 2];
+
+
+% ##############################################################
 %% boolean operators
 
 % Control statements are the key to any program that is able to do things
@@ -305,4 +349,33 @@ while (a < 5)
     a = a + 2;
     disp(a);
 end
+
+% You can break a loop programmatically with the "break" statement
+i = 1;
+% oh no, are we going to loop forever?????!!?!?!
+while (true)
+    disp(['i''s value is: ', num2str(i)]);
+    i = i+1;
+    if (i > 10)
+        break;
+    end
+end
+
+% What if we wanted to skip only the current iteration of a loop? Use the
+% continue statement;
+
+for i = 1:10
+    % skip loop when i is 5
+    if (i == 5)
+        continue;
+    end
+    disp(['i''s value is: ', num2str(i)]);
+end
+
+%% #############################################################
+
+% Write a loop that prints the values 1 through 20, but only prints every
+% other value and skips 16 and 18.
+
+
 

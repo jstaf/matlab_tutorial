@@ -121,7 +121,7 @@ regions.Area
 % recalculate the regionprops with lists of the pixels in each region.
 
 % Fortunately, regionprops has options for that!
-regions = regionprops(labeled, 'Area', 'Centroid', 'PixelList', 'PixelIdxList', 'BoundingBox');
+regions = regionprops(labeled, 'Area', 'Centroid', 'PixelList', 'BoundingBox');
 
 % small regions are filtered out of our data
 regionNum = 1;
@@ -144,9 +144,18 @@ while (regionNum <= length([regions.Area]))
 end
 
 % check to see that we filtered out the small regions
+% logical(labeled) resets it to a binary image with detected objects
+% (basically it sets the max value to 1)
 labeled = bwlabel(logical(labeled));
 showRegions(labeled);
 % so now we only have the birds...
+
+% but what if we wanted to fill in the holes?
+labeled = imfill(logical(labeled), 'holes');
+labeled = bwlabel(labeled);
+showRegions(labeled);
+
+% cool, right?
 
 %% Analyzing objects
 
@@ -184,3 +193,37 @@ hold off;
 % Honestly you can pretty much do anything you want in relation to image
 % processing in MATLAB and it will work. Analyzing videos is just image
 % analysis looped over the length of the video.
+
+%% Manually controlling which areas of an image you want
+
+figure('name', 'ROI select'), imshow(birds);
+ROI_select = imrect;
+ROI = round(wait(ROI_select)); %ROI takes form of [xmin ymin width height]
+close(gcf);
+% crop and display the image
+cropped = imcrop(birds, ROI);
+imshow(cropped);
+
+% imellipse and imfreehand are quite similar, so we will only demo
+% imfreehand (since it's cooler)
+figure('name', 'ROI select'), imshow(birds);
+ROI_select = imfreehand('Closed', true);
+wait(ROI_select);
+mask = createMask(ROI_select); %create a mask from our ROI
+close(gcf);
+
+% did we get it?... lets check
+imshow(mask);
+% make a copy of birds
+birdsCopy = birds;
+% get the green channel
+birdsGreen = birdsCopy(:,:,2);
+% change green pixel values in the ROI to 0... we are using logical
+% indexing to get the right pixels
+birdsGreen(mask == 1) = 0;
+% replace the green channel with our new one
+birdsCopy(:,:,2) = birdsGreen;
+% check our work
+imshowpair(birds, birdsCopy, 'montage');
+
+
